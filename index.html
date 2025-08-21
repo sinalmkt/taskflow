@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TaskFlow</title>
+  <meta name="theme-color" content="#7d3c98"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="manifest" href="manifest.json"/>
+</head>
+<body>
+  <!-- Toast container -->
+  <div id="toastStack" class="toast-stack"></div>
+
+  <div id="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="medusa.png" alt="TaskFlow" class="logo"/>
+        <span>TaskFlow</span>
+      </div>
+      <button id="quickAdd" class="btn primary full">+ Adicionar tarefa</button>
+
+      <nav class="nav">
+        <div class="nav-group">
+          <button class="nav-item" data-view="inbox">📥 Entrada</button>
+          <button class="nav-item" data-view="today">📅 Hoje</button>
+          <button class="nav-item" data-view="soon">⏳ Em breve</button>
+          <button class="nav-item" data-view="report">📈 Produtividade</button>
+        </div>
+        <div class="divider"></div>
+        <div class="nav-group">
+          <div class="nav-title">Meus projetos</div>
+          <div id="projectList" class="list small"></div>
+          <button id="addProject" class="btn tiny outline full">+ Projeto</button>
+        </div>
+        <div class="divider"></div>
+        <div class="nav-group">
+          <div class="nav-title">Equipe</div>
+          <div id="teamList" class="list small"></div>
+          <button id="addTeamProject" class="btn tiny outline full">+ Projeto da equipe</button>
+        </div>
+        <div class="divider"></div>
+        <div class="nav-group">
+          <button class="nav-item" data-view="clients">👤 Clientes</button>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="topbar glass">
+        <div class="title">
+          <h1 id="viewTitle">Hoje</h1>
+          <div class="muted small">Prioridades: Azul (2d) → Laranja (2d) → Vermelho</div>
+        </div>
+        <div class="tools row gap">
+          <input id="search" class="input small" placeholder="Buscar..."/>
+          <select id="statusFilter" class="input small">
+            <option value="ALL">Todas</option>
+            <option value="PENDING">Pendentes</option>
+            <option value="DONE">Concluídas</option>
+          </select>
+          <select id="priorityFilter" class="input small">
+            <option value="ALL">Todas</option>
+            <option value="RED">Vermelho</option>
+            <option value="ORANGE">Laranja</option>
+            <option value="BLUE">Azul</option>
+          </select>
+          <button id="clearDone" class="btn outline">Limpar concluídas</button>
+        </div>
+      </header>
+
+      <section id="tasksPanel">
+        <div class="group">
+          <div class="group-title">Meus projetos</div>
+          <div id="myProjectsList" class="group-items"></div>
+        </div>
+        <div class="group">
+          <div class="group-title">Equipe</div>
+          <div id="teamProjectsList" class="group-items"></div>
+        </div>
+        <div class="add-inline">
+          <button id="addInline" class="btn link">+ Adicionar tarefa</button>
+        </div>
+      </section>
+
+      <section id="clientsPanel" class="hidden">
+        <div class="grid-3">
+          <div>
+            <div class="card glass">
+              <div class="card-header">Novo cliente</div>
+              <div class="card-body">
+                <label>Nome</label>
+                <input id="clientName" class="input" placeholder="Ex.: Loja Pacheco"/>
+                <label>Contato</label>
+                <input id="clientContact" class="input" placeholder="(11) 90000-0000 / e-mail"/>
+                <label>Notas</label>
+                <textarea id="clientNotes" class="input" rows="3"></textarea>
+                <button id="addClient" class="btn primary full">Adicionar</button>
+              </div>
+            </div>
+            <div class="card glass">
+              <div class="card-header">Clientes</div>
+              <div id="clientList" class="list small"></div>
+            </div>
+          </div>
+          <div class="col-span-2">
+            <div class="card glass">
+              <div class="card-header row space gap">
+                <div>
+                  <div id="activeClientName" class="title-sm">Selecione um cliente</div>
+                  <div id="activeClientContact" class="muted small"></div>
+                </div>
+                <div class="row gap">
+                  <input type="file" id="filePicker" multiple hidden/>
+                  <button id="uploadBtn" class="btn" disabled>Enviar</button>
+                  <button id="removeClient" class="btn danger" disabled>Excluir</button>
+                </div>
+              </div>
+              <div class="card-body">
+                <div id="dropZone" class="dropzone disabled">Arraste arquivos aqui ou clique em “Enviar”.</div>
+                <div id="fileGrid" class="grid-files"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="reportPanel" class="hidden">
+        <div class="grid-report">
+          <div class="kpi card glass">
+            <div class="kpi-title">Total</div>
+            <div class="kpi-value" id="kpiTotal">0</div>
+          </div>
+          <div class="kpi card glass">
+            <div class="kpi-title">Concluídas</div>
+            <div class="kpi-value" id="kpiDone">0</div>
+          </div>
+          <div class="kpi card glass">
+            <div class="kpi-title">Pendentes</div>
+            <div class="kpi-value" id="kpiPending">0</div>
+          </div>
+        </div>
+
+        <div class="card glass">
+          <div class="card-header">Gráfico (Concluídas x Pendentes)</div>
+          <div class="card-body">
+            <canvas id="prodChart" width="640" height="240"></canvas>
+          </div>
+        </div>
+
+        <div class="card glass">
+          <div class="card-header">Por prioridade</div>
+          <div class="card-body">
+            <div class="bar-row"><span>🔴 Vermelho</span><div class="bar"><div id="barRed"></div></div><span id="barRedVal">0</span></div>
+            <div class="bar-row"><span>🟠 Laranja</span><div class="bar"><div id="barOrange"></div></div><span id="barOrangeVal">0</span></div>
+            <div class="bar-row"><span>🔵 Azul</span><div class="bar"><div id="barBlue"></div></div><span id="barBlueVal">0</span></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="taskDialog" class="dialog">
+    <form method="dialog" class="dialog-card glass" id="taskForm">
+      <div class="dialog-header">Tarefa</div>
+      <div class="dialog-body grid-2">
+        <div class="full">
+          <label>Título</label>
+          <input id="tTitle" class="input" required/>
+        </div>
+        <div class="full">
+          <label>Descrição</label>
+          <textarea id="tDesc" class="input" rows="3"></textarea>
+        </div>
+        <div>
+          <label>Data</label>
+          <input id="tDue" class="input" type="date"/>
+        </div>
+        <div>
+          <label>Hora</label>
+          <input id="tTime" class="input" type="time"/>
+        </div>
+        <div>
+          <label>Prioridade</label>
+          <select id="tPriority" class="input">
+            <option value="BLUE">Azul</option>
+            <option value="ORANGE">Laranja</option>
+            <option value="RED">Vermelho</option>
+          </select>
+        </div>
+        <div>
+          <label>Projeto</label>
+          <select id="tProject" class="input"></select>
+        </div>
+        <div>
+          <label>Equipe?</label>
+          <select id="tTeam" class="input">
+            <option value="no">Não</option>
+            <option value="yes">Sim</option>
+          </select>
+        </div>
+        <div class="full">
+          <label>Etiquetas</label>
+          <input id="tLabels" class="input" placeholder="#faculdade, #trabalho"/>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button type="button" id="cancelTask" class="btn outline">Cancelar</button>
+        <button type="submit" class="btn primary">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <template id="taskItemTemplate">
+    <div class="task glass">
+      <div class="row space">
+        <div class="row gap">
+          <span class="circle"></span>
+          <div class="title"></div>
+        </div>
+        <div class="row gap">
+          <button class="btn tiny toggle"></button>
+          <button class="btn tiny outline edit">Editar</button>
+          <button class="btn tiny danger del">Excluir</button>
+        </div>
+      </div>
+      <div class="muted small info"></div>
+      <div class="desc"></div>
+    </div>
+  </template>
+
+  <template id="listItemTemplate">
+    <div class="item compact glass">
+      <div class="title"></div>
+      <div class="row gap">
+        <button class="btn tiny outline select">Abrir</button>
+        <button class="btn tiny danger del">Excluir</button>
+      </div>
+    </div>
+  </template>
+
+  <template id="fileCardTemplate">
+    <div class="file-card glass">
+      <div class="thumb"></div>
+      <div class="file-meta">
+        <div class="file-name"></div>
+        <div class="file-row">
+          <div class="file-size"></div>
+          <div class="file-actions">
+            <a class="btn tiny outline" target="_blank">Abrir</a>
+            <a class="btn tiny" download>Baixar</a>
+            <button class="btn tiny danger remove">Excluir</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
