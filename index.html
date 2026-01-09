@@ -66,6 +66,7 @@
             <option value="BLUE">Azul</option>
           </select>
           <button id="clearDone" class="btn outline">Limpar concluídas</button>
+          <button id="themeToggle" class="btn outline">Tema: Sistema</button>
         </div>
       </header>
 
@@ -91,12 +92,40 @@
               <div class="card-body">
                 <label>Nome</label>
                 <input id="clientName" class="input" placeholder="Ex.: Loja Pacheco"/>
+                <label>Pacote</label>
+                <select id="clientPackage" class="input"></select>
                 <label>Contato</label>
                 <input id="clientContact" class="input" placeholder="(11) 90000-0000 / e-mail"/>
                 <label>Notas</label>
                 <textarea id="clientNotes" class="input" rows="3"></textarea>
                 <button id="addClient" class="btn primary full">Adicionar</button>
               </div>
+            </div>
+            <div class="card glass">
+              <div class="card-header">Novo pacote</div>
+              <div class="card-body">
+                <label>Nome do pacote</label>
+                <input id="packageName" class="input" placeholder="Ex.: Premium Mensal"/>
+                <div class="grid-3-fields">
+                  <div>
+                    <label>Artes</label>
+                    <input id="packageArts" type="number" min="0" class="input" placeholder="0"/>
+                  </div>
+                  <div>
+                    <label>Stories</label>
+                    <input id="packageStories" type="number" min="0" class="input" placeholder="0"/>
+                  </div>
+                  <div>
+                    <label>Panfletos</label>
+                    <input id="packageFlyers" type="number" min="0" class="input" placeholder="0"/>
+                  </div>
+                </div>
+                <button id="addPackage" class="btn primary full">Adicionar pacote</button>
+              </div>
+            </div>
+            <div class="card glass">
+              <div class="card-header">Pacotes</div>
+              <div id="packageList" class="list small"></div>
             </div>
             <div class="card glass">
               <div class="card-header">Clientes</div>
@@ -119,6 +148,42 @@
               <div class="card-body">
                 <div id="dropZone" class="dropzone disabled">Arraste arquivos aqui ou clique em “Enviar”.</div>
                 <div id="fileGrid" class="grid-files"></div>
+              </div>
+            </div>
+            <div class="card glass">
+              <div class="card-header">Artes & Copies do cliente</div>
+              <div class="card-body">
+                <div class="stats-grid">
+                  <div class="stat-item">
+                    <div class="stat-label">Feitas no mês</div>
+                    <div id="clientDoneMonth" class="stat-value">0</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">Pendentes no mês</div>
+                    <div id="clientPendingMonth" class="stat-value">0</div>
+                  </div>
+                </div>
+                <div class="card-divider"></div>
+                <div class="grid-3-fields">
+                  <div>
+                    <label>Copy da arte</label>
+                    <input id="clientTaskCopy" class="input" placeholder="Texto da próxima arte"/>
+                  </div>
+                  <div>
+                    <label>Data</label>
+                    <input id="clientTaskDate" type="date" class="input"/>
+                  </div>
+                  <div>
+                    <label>Prioridade</label>
+                    <select id="clientTaskPriority" class="input">
+                      <option value="BLUE">Baixa</option>
+                      <option value="ORANGE">Média</option>
+                      <option value="RED">Alta</option>
+                    </select>
+                  </div>
+                </div>
+                <button id="addClientTask" class="btn primary full">Adicionar tarefa</button>
+                <div id="clientTaskList" class="list"></div>
               </div>
             </div>
           </div>
